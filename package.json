@@ -11,11 +11,14 @@
     },
     "author": "Sergey Shevchenko <“sergiishevchenko017@gmail.com”>",
     "dependencies": {
+        "@sequelize/postgres": "^7.0.0-alpha.45",
         "cors": "^2.8.5",
+        "dotenv": "^16.4.7",
         "express": "^4.21.2",
         "joi": "^17.13.3",
         "morgan": "^1.10.0",
         "nodemon": "^3.1.9",
+        "sequelize": "^6.37.5",
         "uid": "^2.0.2",
         "uuid": "^11.0.5"
     },

@@ -1,72 +1,51 @@
-import { promises as fs } from 'fs';
-import { join } from 'path';
-import { uid } from 'uid';
+import { sequelize } from "../config/db.js";
+import { Contact } from "../models/contacts.js";
 
-const contactsPath = join(process.cwd(), 'db', 'contacts.json');
 
-async function readDataFromFile() {
-    try {
-        const dataFromFile = await fs.readFile(contactsPath);
-        return JSON.parse(dataFromFile);
-    } catch (error) {
-        console.error('Error reading file ', contactsPath);
-        return [];
-    }
-}
-
-async function saveDataToFile(data) {
-    try {
-        await fs.writeFile(contactsPath, JSON.stringify(data, null, 2));
-    } catch (error) {
-        console.error('Error storing data to file.', contactsPath);
-    }
-}
+sequelize
+  .authenticate()
+  .then(() => {
+    console.log("Database connection successful");
+    Contact.sync();
+    console.log("Contact modes was synchronized successfully");
+  })
+  .catch((error) => {
+    console.log("Database connection failed", error);
+    process.exit(1);
+  });
 
 async function listContacts() {
-    const contactsList = await readDataFromFile();
+    const contactsList = await Contact.findAll();
     return [...contactsList];
 }
 
 async function getContactById(contactId) {
-    const contactsList = await listContacts();
-    const contact = contactsList.find(({ id }) => id === contactId);
+    const contact = Contact.findAll({where : {id : contactId}});
     return contact || null;
 }
 
 async function addContact({ name, email, phone }) {
-    const contactsList = await listContacts();
-    const newContact = { id: uid(), name, email, phone };
-    contactsList.push(newContact);
-    await saveDataToFile(contactsList);
-    return newContact;
+    const newContact = await Contact.create({name, email, phone});
+    await newContact.save();
+    return newContact.toJSON();
 }
 
 async function removeContact(contactId) {
-    const contactsList = await listContacts();
-    const idx = contactsList.findIndex(({ id }) => id === contactId);
-    if (idx === -1) {
-        return null;
-    }
-    const [contact] = contactsList.splice(idx, 1);
-    await saveDataToFile(contactsList);
-    return contact;
+    const contact = await Contact.findAll({where: {id: contactId}});
+    await Contact.destroy({where: {id: contactId}});
+    return contact?.[0] || null;
 }
 
 async function updateContact(contactId, { ...data }) {
-    const contactsList = await listContacts();
-    const idx = contactsList.findIndex(({ id }) => id === contactId);
-    if (idx === -1) {
-        return null;
-    }
-    const updatedContact = { ...contactsList[idx] };
-    for (const key in data) {
-        if (data[key] !== undefined) {
-            updatedContact[key] = data[key];
-        }
-    }
-    contactsList[idx] = { ...contactsList[idx], ...updatedContact };
-    await saveDataToFile(contactsList);
-    return updatedContact;
+    await Contact.update(data, { where: { id: contactId } });
+    const updatedContact = await Contact.findAll({ where: { id: contactId } });
+    return updatedContact.length ? updatedContact[0] : null;
+}
+
+async function updateStatusContact(contactId, { favorite }) {
+    await Contact.update({ favorite }, { where: { id: contactId } });
+    const updatedStatusContact = await Contact.findAll({ where: { id: contactId } });
+    return updatedStatusContact?.[0] || null;
 }
 
 export default {
@@ -75,4 +54,5 @@ export default {
     removeContact,
     addContact,
     updateContact,
+    updateStatusContact,
 };

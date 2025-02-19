@@ -1,15 +1,15 @@
 import express from 'express';
 import {
-  getAllContacts,
-  getOneContact,
-  deleteContact,
-  createContact,
-  updateContact,
+    getAllContacts,
+    getOneContact,
+    deleteContact,
+    createContact,
+    updateContact,
 } from '../controllers/contactsControllers.js';
 
 import {
-  createContactSchema,
-  updateContactSchema,
+    createContactSchema,
+    updateContactSchema,
 } from '../schemas/contactsSchemas.js';
 
 import validateBody from '../helpers/validateBody.js';
@@ -24,15 +24,15 @@ contactsRouter.get('/:id', ctrlWrapper(getOneContact));
 contactsRouter.delete('/:id', ctrlWrapper(deleteContact));
 
 contactsRouter.post(
-  '/',
-  validateBody(createContactSchema),
-  ctrlWrapper(createContact)
+    '/',
+    validateBody(createContactSchema),
+    ctrlWrapper(createContact)
 );
 
 contactsRouter.put(
-  '/:id',
-  validateBody(updateContactSchema),
-  ctrlWrapper(updateContact)
+    '/:id',
+    validateBody(updateContactSchema),
+    ctrlWrapper(updateContact)
 );
 
 export default contactsRouter;

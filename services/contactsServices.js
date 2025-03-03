@@ -9,7 +9,7 @@ async function listContacts(query, pagination) {
 
 async function getContact(query) {
     const { id, owner } = query;
-    const contact = Contact.findAll({ where: { id, owner } });
+    const contact = Contact.findOne({ where: { id, owner } });
     return contact || null;
 }
 
@@ -50,7 +50,7 @@ async function updateStatusContact(query, { favorite }) {
     if (!updatedStatusContact) {
         return null;
     }
-    await updatedStatusContact.update(favorite);
+    await updatedStatusContact.update({ favorite });
     return updatedStatusContact.toJSON();
 }
 

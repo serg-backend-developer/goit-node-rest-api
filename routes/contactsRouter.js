@@ -28,22 +28,22 @@ contactsRouter.delete('/:id', authenticate, ctrlWrapper(deleteContact));
 
 contactsRouter.post(
     '/',
-    validateBody(createContactSchema),
     authenticate,
+    validateBody(createContactSchema),
     ctrlWrapper(createContact)
 );
 
 contactsRouter.put(
     '/:id',
-    validateBody(updateContactSchema),
     authenticate,
+    validateBody(updateContactSchema),
     ctrlWrapper(updateContact)
 );
 
 contactsRouter.patch(
     '/:id/favorite',
-    validateBody(updateContactFavoriteSchema),
     authenticate,
+    validateBody(updateContactFavoriteSchema),
     ctrlWrapper(updateStatusContact)
 );
 

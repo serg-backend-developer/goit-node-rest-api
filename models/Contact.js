@@ -13,10 +13,16 @@ export const Contact = sequelize.define('Contact', {
     name: {
         type: DataTypes.STRING,
         allowNull: false,
+        validate: {
+            notEmpty: true,
+        }
     },
     email: {
         type: DataTypes.STRING,
         allowNull: false,
+        validate: {
+            isEmail: true,
+        }
     },
     phone: {
         type: DataTypes.STRING,
@@ -34,6 +40,6 @@ export const Contact = sequelize.define('Contact', {
             key: 'id',
             deferrable: Deferrable.NOT,
         },
+        defaultValue: 1,
     },
-    defaultValue: 1,
 });

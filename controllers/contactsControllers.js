@@ -31,7 +31,6 @@ export const getOneContact = async (req, res) => {
 
 export const updateContact = async (req, res) => {
     const updatedContact = await contactsService.updateContact(
-        req.params.id,
         {
             id: req.params.id,
             owner: req.user.id,
@@ -59,7 +58,6 @@ export const deleteContact = async (req, res) => {
 
 export const updateStatusContact = async (req, res) => {
     const updatedStatusContact = await contactsService.updateStatusContact(
-        req.params.id,
         {
             id: req.params.id,
             owner: req.user.id,

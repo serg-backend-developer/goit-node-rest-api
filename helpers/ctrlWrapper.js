@@ -1,5 +1,8 @@
 import HttpError from './HttpError.js';
-import { VALIDATIOIN_ERROR, CONSTRAINT_ERROR } from '../constants/errorMessages.js';
+import {
+    VALIDATIOIN_ERROR,
+    CONSTRAINT_ERROR,
+} from '../constants/errorMessages.js';
 
 const ctrlWrapper = (controller) => {
     const func = async (req, res, next) => {

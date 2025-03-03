@@ -1,5 +1,7 @@
-import { DataTypes } from 'sequelize';
+import { DataTypes, Deferrable } from 'sequelize';
 import { sequelize } from '../config/db.js';
+
+import { User } from './User.js';
 
 export const Contact = sequelize.define('Contact', {
     id: {
@@ -24,4 +26,14 @@ export const Contact = sequelize.define('Contact', {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
     },
+    owner: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+            model: User,
+            key: 'id',
+            deferrable: Deferrable.NOT,
+        },
+    },
+    defaultValue: 1,
 });

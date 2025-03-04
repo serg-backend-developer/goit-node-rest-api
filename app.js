@@ -2,8 +2,12 @@ import cors from 'cors';
 import express from 'express';
 import morgan from 'morgan';
 
+import authRouter from './routes/authRouter.js';
+import { checkDBConnection } from './helpers/db.js';
 import contactsRouter from './routes/contactsRouter.js';
-import config from '../config/config.js';
+import config from './config/config.js';
+
+checkDBConnection();
 
 const app = express();
 
@@ -11,6 +15,7 @@ app.use(morgan('tiny'));
 app.use(cors());
 app.use(express.json());
 
+app.use('/api/auth', authRouter);
 app.use('/api/contacts', contactsRouter);
 
 app.use((_, res) => {

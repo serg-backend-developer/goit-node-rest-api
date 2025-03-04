@@ -1,57 +1,62 @@
-import { sequelize } from '../config/db.js';
-import { Contact } from '../models/contacts.js';
+import { Contact } from '../models/Contact.js';
 
-sequelize
-    .authenticate()
-    .then(() => {
-        console.log('Database connection successful');
-        Contact.sync();
-        console.log('Contact modes was synchronized successfully');
-    })
-    .catch((error) => {
-        console.log('Database connection failed', error);
-        process.exit(1);
-    });
-
-async function listContacts() {
-    const contactsList = await Contact.findAll();
+async function listContacts(query, pagination) {
+    const { limit, page } = pagination;
+    const offset = (page - 1) * limit || 0;
+    const contactsList = await Contact.findAll({ where: query, offset, limit });
     return [...contactsList];
 }
 
-async function getContactById(contactId) {
-    const contact = Contact.findAll({ where: { id: contactId } });
+async function getContact(query) {
+    const { id, owner } = query;
+    const contact = Contact.findOne({ where: { id, owner } });
     return contact || null;
 }
 
-async function addContact({ name, email, phone }) {
-    const newContact = await Contact.create({ name, email, phone });
+async function addContact(query) {
+    const { name, email, phone, favorite, owner } = query;
+    const newContact = await Contact.create({
+        name,
+        email,
+        phone,
+        favorite,
+        owner,
+    });
     await newContact.save();
     return newContact.toJSON();
 }
 
-async function removeContact(contactId) {
-    const contact = await Contact.findAll({ where: { id: contactId } });
-    await Contact.destroy({ where: { id: contactId } });
-    return contact?.[0] || null;
+async function removeContact(query) {
+    const contact = await getContact(query);
+    if (!contact) {
+        return null;
+    }
+    const removedContact = contact.toJSON();
+    await contact.destroy();
+    return removedContact;
 }
 
-async function updateContact(contactId, { ...data }) {
-    await Contact.update(data, { where: { id: contactId } });
-    const updatedContact = await Contact.findAll({ where: { id: contactId } });
-    return updatedContact.length ? updatedContact[0] : null;
+async function updateContact(query, { ...data }) {
+    const updatedContact = await getContact(query);
+    if (!updatedContact) {
+        return null;
+    }
+    await updatedContact.update(data);
+    return updatedContact.toJSON();
 }
 
-async function updateStatusContact(contactId, { favorite }) {
-    await Contact.update({ favorite }, { where: { id: contactId } });
-    const updatedStatusContact = await Contact.findAll({
-        where: { id: contactId },
-    });
-    return updatedStatusContact?.[0] || null;
+async function updateStatusContact(query, { favorite }) {
+    const updatedStatusContact = await getContact(query);
+    if (!updatedStatusContact) {
+        return null;
+    }
+    await updatedStatusContact.update({ favorite });
+    return updatedStatusContact.toJSON();
 }
 
 export default {
     listContacts,
-    getContactById,
+    getContact,
     removeContact,
     addContact,
     updateContact,

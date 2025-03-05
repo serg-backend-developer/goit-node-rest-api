@@ -1,5 +1,7 @@
 import bcrypt from 'bcrypt';
+import gravatar from 'gravatar';
 
+import config from '../config/config.js';
 import HttpError from '../helpers/HttpError.js';
 import { generateToken } from '../helpers/jwt.js';
 import { User } from '../models/User.js';
@@ -10,10 +12,12 @@ const register = async ({ email, password, subscription }) => {
         throw HttpError(409, 'Such email already exists.');
     }
     const hashedPassword = await bcrypt.hash(password, 10);
+    const avatarURL = gravatar.url(email, { protocol: 'https', s: '250' });
     const user = await User.create({
         email,
         password: hashedPassword,
         subscription,
+        avatarURL,
     });
     return user;
 };
@@ -61,4 +65,21 @@ const findUser = async (email) => {
     return await User.findOne({ where: { email } });
 };
 
-export default { register, login, logout, subscription, findUser };
+const changeAvatar = async (email, { avatarURL: avatarURL }) => {
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+        throw HttpError(401, 'Not authorized.');
+    }
+    user.avatarURL = `http://${config.DOMAIN}:$${config.PORT}/${avatarURL}`;
+    await user.save();
+    return user;
+};
+
+export default {
+    register,
+    login,
+    logout,
+    subscription,
+    findUser,
+    changeAvatar,
+};

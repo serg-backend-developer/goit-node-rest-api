@@ -65,12 +65,19 @@ const findUser = async (email) => {
     return await User.findOne({ where: { email } });
 };
 
-const changeAvatar = async (email, { avatarURL: avatarURL }) => {
+const changeAvatar = async (email, { avatarURI, avatarURL }) => {
     const user = await User.findOne({ where: { email } });
     if (!user) {
         throw HttpError(401, 'Not authorized.');
     }
-    user.avatarURL = `http://${config.DOMAIN}:$${config.PORT}/${avatarURL}`;
+    if (avatarURI && !avatarURL)
+    {
+        user.avatarURL = `http://${config.DOMAIN}:$${config.PORT}/${avatarURI}`;
+    }
+    else if (avatarURL)
+    {
+        user.avatarURL = avatarURL;
+    }
     await user.save();
     return user;
 };

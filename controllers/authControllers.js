@@ -59,14 +59,16 @@ export const changeAvatar = async (req, res) => {
     const fileName = `${emailString}-${Math.round(
         Math.random() * 1e9
     )}${extension}`;
-    const finalPath = path.join(storeImage, fileName);
+
     try {
+        const finalPath = path.join(storeImage, fileName);
         await fs.rename(tempPath, finalPath);
+        req.file.avatarURI = `${avatarStore}/${fileName}`;
     } catch (error) {
         await fs.unlink(tempPath);
-        return next(error);
+        throw HttpError(500, error.message);
     }
-    req.file.avatarURI = `${avatarStore}/${fileName}`;
+
     const result = await authServices.changeAvatar(email, req.file);
     res.json({
         avatarURL: result.avatarURL,

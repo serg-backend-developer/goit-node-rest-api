@@ -15,14 +15,14 @@ export const Contact = sequelize.define('Contact', {
         allowNull: false,
         validate: {
             notEmpty: true,
-        }
+        },
     },
     email: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
             isEmail: true,
-        }
+        },
     },
     phone: {
         type: DataTypes.STRING,

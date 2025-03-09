@@ -1,5 +1,6 @@
 import express from 'express';
 
+import { upload } from '../helpers/storageFiles.js';
 import ctrlWrapper from '../helpers/ctrlWrapper.js';
 import validateBody from '../helpers/validateBody.js';
 import {
@@ -8,6 +9,7 @@ import {
     getCurrent,
     logout,
     subscription,
+    changeAvatar,
 } from '../controllers/authControllers.js';
 import {
     loginSchema,
@@ -31,6 +33,12 @@ authRouter.patch(
     authenticate,
     validateBody(subscriptionSchema),
     ctrlWrapper(subscription)
+);
+authRouter.patch(
+    '/avatar',
+    authenticate,
+    upload.single('picture'),
+    ctrlWrapper(changeAvatar)
 );
 
 export default authRouter;

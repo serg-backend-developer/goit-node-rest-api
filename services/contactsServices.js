@@ -1,64 +1,73 @@
-import { Contact } from '../models/Contact.js';
+import Contact from '../models/Contact.js';
 
-async function listContacts(query, pagination) {
-    const { limit, page } = pagination;
-    const offset = (page - 1) * limit || 0;
-    const contactsList = await Contact.findAll({ where: query, offset, limit });
-    return [...contactsList];
+export async function listContacts(userId) {
+    try {
+        return await Contact.findAll({
+            where: { owner: userId },
+        });
+    } catch (error) {
+        return [];
+    }
 }
 
-async function getContact(query) {
-    const { id, owner } = query;
-    const contact = Contact.findOne({ where: { id, owner } });
-    return contact || null;
-}
-
-async function addContact(query) {
-    const { name, email, phone, favorite, owner } = query;
-    const newContact = await Contact.create({
-        name,
-        email,
-        phone,
-        favorite,
-        owner,
-    });
-    await newContact.save();
-    return newContact.toJSON();
-}
-
-async function removeContact(query) {
-    const contact = await getContact(query);
-    if (!contact) {
+export async function getContactById(contactId, userId) {
+    try {
+        return Contact.findOne({ where: { owner: userId, id: contactId } });
+    } catch (error) {
         return null;
     }
-    const removedContact = contact.toJSON();
-    await contact.destroy();
-    return removedContact;
 }
 
-async function updateContact(query, { ...data }) {
-    const updatedContact = await getContact(query);
-    if (!updatedContact) {
+export async function addContact(name, email, phone, userId) {
+    try {
+        const contact = await Contact.findOne({
+            where: { id: contactId, owner: userId },
+        });
+        if (!contact) return null;
+        await contact.destroy();
+        return contact;
+    } catch (error) {
         return null;
     }
-    await updatedContact.update(data);
-    return updatedContact.toJSON();
 }
 
-async function updateStatusContact(query, { favorite }) {
-    const updatedStatusContact = await getContact(query);
-    if (!updatedStatusContact) {
+export async function updateCurrentContact(id, userId, body) {
+    try {
+        const updatedContact = await Contact.findOne({
+            where: { owner: userId, id: contactId },
+        });
+        if (!updatedContact) {
+            return null;
+        }
+        await updatedContact.update(body);
+        return updatedContact;
+    } catch (error) {
         return null;
     }
-    await updatedStatusContact.update({ favorite });
-    return updatedStatusContact.toJSON();
 }
 
-export default {
-    listContacts,
-    getContact,
-    removeContact,
-    addContact,
-    updateContact,
-    updateStatusContact,
-};
+export async function updateStatusContact(id, userId, body) {
+    try {
+        const updatedContact = await Contact.findOne({ where: { id, owner: userId } });
+        if (!updatedContact) {
+            return null;
+        }
+        await updatedContact.update(body);
+        return updatedContact;
+    } catch (error) {
+        return null;
+    }
+}
+
+export async function removeContact(contactId, userId) {
+    try {
+        const deletedContact = await Contact.findOne({
+            where: { id: contactId, owner: userId },
+        });
+        if (!deletedContact) return null;
+        await deletedContact.destroy();
+        return deletedContact;
+    } catch (error) {
+        return null;
+    }
+}

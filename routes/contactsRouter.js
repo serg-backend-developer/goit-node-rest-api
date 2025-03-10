@@ -1,4 +1,6 @@
 import express from 'express';
+
+import { authentication } from '../helpers/authentication.js';
 import {
     getAllContacts,
     getOneContact,
@@ -7,17 +9,16 @@ import {
     updateContact,
     updateFavorite,
 } from '../controllers/contactsControllers.js';
-
 import {
     createContactSchema,
     updateContactSchema,
     updateContactFavoriteSchema,
 } from '../schemas/contactsSchemas.js';
 
-import { authentication } from '../helpers/authentication.js';
 import validateBody from '../helpers/validateBody.js';
 
 const contactsRouter = express.Router();
+
 contactsRouter.get('/', authentication, getAllContacts);
 contactsRouter.get('/:id', authentication, getOneContact);
 contactsRouter.delete('/:id', authentication, deleteContact);

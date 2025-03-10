@@ -1,11 +1,10 @@
 import { DataTypes } from 'sequelize';
-import { sequelize } from '../config/db.js';
+import sequelize from '../db/config.js';
 
-export const User = sequelize.define('User', {
+const User = sequelize.define('users', {
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        allowNull: false,
         autoIncrement: true,
     },
     password: {
@@ -16,9 +15,6 @@ export const User = sequelize.define('User', {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
-        validate: {
-            isEmail: true,
-        },
     },
     subscription: {
         type: DataTypes.ENUM,
@@ -29,11 +25,7 @@ export const User = sequelize.define('User', {
         type: DataTypes.STRING,
         defaultValue: null,
     },
-    avatarURL: {
-        type: DataTypes.STRING,
-        defaultValue: null,
-        validate: {
-            isUrl: true,
-        },
-    },
+    avatarURL: DataTypes.STRING,
 });
+
+export default User;

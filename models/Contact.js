@@ -1,28 +1,20 @@
-import { DataTypes, Deferrable } from 'sequelize';
-import { sequelize } from '../config/db.js';
+import { DataTypes } from 'sequelize';
+import sequelize from '../db/config.js';
 
-import { User } from './User.js';
-
-export const Contact = sequelize.define('Contact', {
+const Contact = sequelize.define('contacts', {
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        allowNull: false,
         autoIncrement: true,
     },
     name: {
         type: DataTypes.STRING,
         allowNull: false,
-        validate: {
-            notEmpty: true,
-        },
     },
     email: {
         type: DataTypes.STRING,
         allowNull: false,
-        validate: {
-            isEmail: true,
-        },
+        unique: true,
     },
     phone: {
         type: DataTypes.STRING,
@@ -35,11 +27,7 @@ export const Contact = sequelize.define('Contact', {
     owner: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        references: {
-            model: User,
-            key: 'id',
-            deferrable: Deferrable.NOT,
-        },
-        defaultValue: 1,
     },
 });
+
+export default Contact;

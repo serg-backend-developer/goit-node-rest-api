@@ -59,7 +59,7 @@ export async function logout(req, res) {
     return res.status(logoutUser.status).send();
 }
 
-export const uploadAvatar = async (req, res) => {
+export const changeAvatar = async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ error: 'No file uploaded.' });

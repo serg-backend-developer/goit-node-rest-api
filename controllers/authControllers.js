@@ -6,7 +6,7 @@ import {
     registerUser,
     loginUser,
     logoutUser,
-    uploadAvatarService,
+    uploadAvatar,
 } from '../services/authServices.js';
 
 import { __dirname } from '../constants/consts.js';
@@ -70,7 +70,7 @@ export const changeAvatar = async (req, res) => {
         const newFilePath = path.join(avatarsDir, newFilename);
         await fs.rename(tempPath, newFilePath);
         const avatarURL = `/avatars/${newFilename}`;
-        await uploadAvatarService(req, avatarURL);
+        await uploadAvatar(req, avatarURL);
         res.status(200).json({ avatarURL });
     } catch (error) {
         res.status(500).json({ error: 'Failed to upload avatar.' });

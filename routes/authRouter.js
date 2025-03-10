@@ -1,44 +1,42 @@
 import express from 'express';
+import multer from 'multer';
+import path from 'path';
 
-import { upload } from '../helpers/storageFiles.js';
-import ctrlWrapper from '../helpers/ctrlWrapper.js';
+import { authentication } from '../helpers/authentication.js';
+import { __dirname } from '../constants/consts.js';
 import validateBody from '../helpers/validateBody.js';
 import {
     register,
     login,
     getCurrent,
     logout,
-    subscription,
     changeAvatar,
 } from '../controllers/authControllers.js';
-import {
-    loginSchema,
-    registerSchema,
-    subscriptionSchema,
-} from '../schemas/authSchema.js';
-import { authenticate } from '../helpers/jwt.js';
+import { registerSchema } from '../schemas/authSchema.js';
 
 const authRouter = express.Router();
 
-authRouter.post(
-    '/register',
-    validateBody(registerSchema),
-    ctrlWrapper(register)
-);
-authRouter.post('/login', validateBody(loginSchema), ctrlWrapper(login));
-authRouter.post('/logout', authenticate, ctrlWrapper(logout));
-authRouter.get('/current', authenticate, ctrlWrapper(getCurrent));
+const uploadDir = path.join(__dirname, '../temp');
+const storage = multer.diskStorage({
+    destination: uploadDir,
+    filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname);
+        cb(null, `${req.user.id}${ext}`);
+    },
+});
+
+const upload = multer({ storage });
+
+// routes
+authRouter.post('/register', validateBody(registerSchema), register);
+authRouter.post('/login', validateBody(registerSchema), login);
+authRouter.post('/logout', authentication, logout);
+authRouter.get('/current', authentication, getCurrent);
 authRouter.patch(
-    '/subscription',
-    authenticate,
-    validateBody(subscriptionSchema),
-    ctrlWrapper(subscription)
-);
-authRouter.patch(
-    '/avatar',
-    authenticate,
+    '/avatars',
+    authentication,
     upload.single('picture'),
-    ctrlWrapper(changeAvatar)
+    changeAvatar
 );
 
 export default authRouter;

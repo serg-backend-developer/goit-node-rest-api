@@ -5,7 +5,7 @@ import {
     deleteContact,
     createContact,
     updateContact,
-    updateStatusContact,
+    updateFavorite,
 } from '../controllers/contactsControllers.js';
 
 import {
@@ -14,37 +14,30 @@ import {
     updateContactFavoriteSchema,
 } from '../schemas/contactsSchemas.js';
 
-import { authenticate } from '../helpers/jwt.js';
-import ctrlWrapper from '../helpers/ctrlWrapper.js';
+import { authentication } from '../helpers/authentication.js';
 import validateBody from '../helpers/validateBody.js';
 
 const contactsRouter = express.Router();
-
-contactsRouter.get('/', authenticate, ctrlWrapper(getAllContacts));
-
-contactsRouter.get('/:id', authenticate, ctrlWrapper(getOneContact));
-
-contactsRouter.delete('/:id', authenticate, ctrlWrapper(deleteContact));
-
+contactsRouter.get('/', authentication, getAllContacts);
+contactsRouter.get('/:id', authentication, getOneContact);
+contactsRouter.delete('/:id', authentication, deleteContact);
 contactsRouter.post(
     '/',
-    authenticate,
+    authentication,
     validateBody(createContactSchema),
-    ctrlWrapper(createContact)
+    createContact
 );
-
 contactsRouter.put(
     '/:id',
-    authenticate,
+    authentication,
     validateBody(updateContactSchema),
-    ctrlWrapper(updateContact)
+    updateContact
 );
-
 contactsRouter.patch(
     '/:id/favorite',
-    authenticate,
+    authentication,
     validateBody(updateContactFavoriteSchema),
-    ctrlWrapper(updateStatusContact)
+    updateFavorite
 );
 
 export default contactsRouter;

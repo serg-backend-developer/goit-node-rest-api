@@ -48,7 +48,9 @@ export async function updateCurrentContact(id, userId, body) {
 
 export async function updateStatusContact(id, userId, body) {
     try {
-        const updatedContact = await Contact.findOne({ where: { id, owner: userId } });
+        const updatedContact = await Contact.findOne({
+            where: { id, owner: userId },
+        });
         if (!updatedContact) {
             return null;
         }

@@ -11,7 +11,7 @@ import {
 
 import { __dirname } from '../constants/consts.js';
 
-const avatarsDir = path.join(__dirname, '../public/avatar');
+const avatarsDir = path.join(__dirname, '../public/avatars');
 
 export async function getCurrent(req, res) {
     const currUser = req.user;
@@ -69,7 +69,7 @@ export const uploadAvatar = async (req, res) => {
         const newFilename = `${req.user.id}${extName}`;
         const newFilePath = path.join(avatarsDir, newFilename);
         await fs.rename(tempPath, newFilePath);
-        const avatarURL = `/avatar/${newFilename}`;
+        const avatarURL = `/avatars/${newFilename}`;
         await uploadAvatarService(req, avatarURL);
         res.status(200).json({ avatarURL });
     } catch (error) {

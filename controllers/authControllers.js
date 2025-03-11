@@ -39,24 +39,24 @@ export async function register(req, res) {
 
 export async function login(req, res) {
     const { email, password } = req.body;
-    const loginUser = await loginUser(email, password);
-    if (loginUser.error) {
+    const result = await loginUser(email, password);
+    if (result.error) {
         return res
-            .status(loginUser.error.status)
-            .json({ message: loginUser.error.message });
+            .status(result.error.status)
+            .json({ message: result.error.message });
     }
-    res.status(200).json(loginUser);
+    res.status(200).json(result);
 }
 
 export async function logout(req, res) {
     const user = req.user;
-    const logoutUser = await logoutUser(user);
-    if (logoutUser.error) {
+    const result = await logoutUser(user);
+    if (result.error) {
         return res
-            .status(logoutUser.error.status)
-            .json({ message: logoutUser.error.message });
+            .status(result.error.status)
+            .json({ message: result.error.message });
     }
-    return res.status(logoutUser.status).send();
+    return res.status(result.status).send();
 }
 
 export const changeAvatar = async (req, res) => {

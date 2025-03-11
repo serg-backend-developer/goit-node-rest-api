@@ -14,8 +14,8 @@
 
 ![PGADMIN 2](screens/pgadmin2.png)
 
-![Get avatar](screens/get_ava.png)
-
 ![Patch avatar](screens/patch_ava.png)
+
+![Get avatar](screens/get_ava.png)
 
 ![Contacts](screens/get_contacts.png)

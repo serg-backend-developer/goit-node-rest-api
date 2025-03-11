@@ -2,10 +2,6 @@
 
 #### Demonstration how it works.
 
-![Upload avatar](screens/upload_avatar.png)
-
-![Get avatar from folder public/avatar](screens/get_avatar.png)
-
 ![Login](screens/login.png)
 
 ![Current](screens/current.png)

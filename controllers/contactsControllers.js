@@ -1,72 +1,100 @@
-import contactsService from '../services/contactsServices.js';
-import HttpError from '../helpers/HttpError.js';
+import {
+    listContacts,
+    getContactById,
+    removeContact,
+    addContact,
+    updateCurrentContact,
+    updateStatusContact,
+} from '../services/contactsServices.js';
 
 export const getAllContacts = async (req, res) => {
-    const { id: owner } = req.user;
-    const pagination = { limit: req.query.limit, page: req.query.page };
-    if (req.query.favorite) {
-        query.favorite = req.query.favorite;
+    try {
+        const userId = req.user.dataValues.id;
+        const contactsList = await listContacts(userId);
+        return res.status(200).json(contactsList);
+    } catch (error) {
+        console.error('Error fetching contacts:', error);
+        return res.status(500).json({ message: 'Internal server error!' });
     }
-    const contacts = await contactsService.listContacts({ owner }, pagination);
-    res.json(contacts);
-};
-
-export const createContact = async (req, res) => {
-    const { id: owner } = req.user;
-    const newContact = await contactsService.addContact({ ...req.body, owner });
-    res.status(201).json(newContact);
 };
 
 export const getOneContact = async (req, res) => {
-    const contact = await contactsService.getContact({
-        id: req.params.id,
-        owner: req.user.id,
-    });
-    if (contact) {
-        res.json(contact);
-    } else {
-        throw HttpError(404, `Contact with id = ${req.params.id} not found.`);
+    try {
+        const userId = req.user.dataValues.id;
+        const { id } = req.params;
+        const contact = await getContactById(id, userId);
+        if (contact) {
+            return res.status(200).json(contact);
+        } else {
+            return res.status(404).json({ message: 'Not found.' });
+        }
+    } catch (error) {
+        console.error('Error fetching contact by ID:', error);
+        return res.status(500).json({ message: 'Internal server error.' });
+    }
+};
+
+export const createContact = async (req, res) => {
+    try {
+        const userId = req.user.dataValues.id;
+        const newContact = await addContact(
+            req.body.name,
+            req.body.email,
+            req.body.phone,
+            userId
+        );
+        return res.status(201).json(newContact);
+    } catch (error) {
+        console.error('Error creating contact:', error);
+        return res.status(500).json({ message: 'Internal server error.' });
     }
 };
 
 export const updateContact = async (req, res) => {
-    const updatedContact = await contactsService.updateContact(
-        {
-            id: req.params.id,
-            owner: req.user.id,
-        },
-        req.body
-    );
-    if (updatedContact) {
-        res.json(updatedContact);
-    } else {
-        throw HttpError(404, `Contact with id = ${req.params.id} not found.`);
+    try {
+        if (Object.keys(req.body).length === 0) {
+            return res
+                .status(400)
+                .json({ message: 'Body must have at least one field' });
+        }
+
+        const { id } = req.params;
+        const userId = req.user.dataValues.id;
+        const updatedContact = await updateCurrentContact(id, userId, req.body);
+        if (updatedContact) {
+            return res.status(200).json(updatedContact);
+        } else {
+            return res.status(404).json({ message: 'Not found.' });
+        }
+    } catch (error) {
+        console.error('Error updating contact:', error);
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };
+
+export async function updateFavorite(req, res) {
+    const { id } = req.params;
+    const { favorite } = req.body;
+    const userId = req.user.dataValues.id;
+    const updatedContact = await updateStatusContact(id, userId, { favorite });
+    if (!updatedContact) {
+        return res.status(404).json({ message: 'Not found.' });
+    }
+    return res.status(200).json(updatedContact);
+}
 
 export const deleteContact = async (req, res) => {
-    const del_contact = await contactsService.removeContact({
-        id: req.params.id,
-        owner: req.user.id,
-    });
-    if (del_contact) {
-        res.json(del_contact);
-    } else {
-        throw HttpError(404, `Contact with id = ${req.params.id} not found.`);
-    }
-};
-
-export const updateStatusContact = async (req, res) => {
-    const updatedStatusContact = await contactsService.updateStatusContact(
-        {
-            id: req.params.id,
-            owner: req.user.id,
-        },
-        req.body
-    );
-    if (updatedStatusContact) {
-        res.json(updatedStatusContact);
-    } else {
-        throw HttpError(404, `Contact with id = ${req.params.id} not found.`);
+    try {
+        const { id } = req.params;
+        const userId = req.user.dataValues.id;
+        const deletedContact = await removeContact(id, userId);
+        if (deletedContact) {
+            return res.status(200).json(deletedContact);
+        } else {
+            return res.status(404).json({ message: 'Not found' });
+        }
+    } catch (error) {
+        console.error('Error deleting contact:', error);
+        return res.status(500).json({ message: 'Internal server error.' });
     }
 };

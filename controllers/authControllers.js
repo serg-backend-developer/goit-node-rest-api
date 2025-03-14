@@ -96,18 +96,14 @@ export const revalidateUserEmail = async (req, res) => {
                 .json({ message: 'Email field is required.' });
         }
         const user = await resendVerificationRequest(email);
-        return res
-            .status(200)
-            .json({
-                message: 'Verification email has been successfully sent.',
-            });
+        return res.status(200).json({
+            message: 'Verification email has been successfully sent.',
+        });
     } catch (error) {
         console.error(error);
-        return res
-            .status(500)
-            .json({
-                message:
-                    'An unexpected error occurred while processing the request.',
-            });
+        return res.status(500).json({
+            message:
+                'An unexpected error occurred while processing the request.',
+        });
     }
 };

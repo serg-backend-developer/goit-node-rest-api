@@ -1,12 +1,12 @@
 import nodemailer from 'nodemailer';
 
 const mailTransporter = nodemailer.createTransport({
-    host: process.env.UKR_EMAIL_HOST,
+    host: process.env.EMAIL_HOST,
     port: 465,
     secure: true,
     auth: {
         user: process.env.EMAIL,
-        pass: process.env.UKR_EMAIL_KEY,
+        pass: process.env.EMAIL_PASSWORD,
     },
 });
 

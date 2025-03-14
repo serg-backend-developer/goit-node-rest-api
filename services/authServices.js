@@ -4,6 +4,8 @@ import multer from 'multer';
 import path from 'path';
 
 import { SECRET_KEY } from '../constants/consts.js';
+import { sendMail } from './nodemailerService.js';
+import { verificationToken, verificationLink } from '../constants/consts.js';
 import User from '../models/User.js';
 
 // lecture block
@@ -25,7 +27,16 @@ export async function registerUser(email, password) {
             return { error: { status: 409, message: 'Email in use.' } };
         }
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = await User.create({ email, password: hashedPassword });
+        const newUser = await User.create({
+            email,
+            password: hashedPassword,
+            verificationToken,
+        });
+        await sendMail(
+            newUser.email,
+            'Verification email',
+            `Click on link for verification: ${verificationLink}`
+        );
         return {
             user: {
                 email: newUser.email,
@@ -45,6 +56,9 @@ export async function loginUser(email, password) {
             return {
                 error: { status: 401, message: 'Email or password is wrong.' },
             };
+        }
+        if (!user.verify) {
+            return { error: { status: 403, message: 'Email not verified' } };
         }
         const isValid = await bcrypt.compare(password, user.password);
         if (!isValid) {
@@ -93,4 +107,40 @@ export async function uploadAvatar(req, avatarURL) {
         console.error(error);
         throw new Error('Internal Server Error.');
     }
+}
+
+export async function validateCurrUser(req, res) {
+    try {
+        const { verificationToken } = req.params;
+        const user = await User.findOne({ where: { verificationToken } });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        await User.update(
+            { verify: true, verificationToken: null },
+            { where: { id: user.id } }
+        );
+        return res.status(200).json({ message: 'Verification successful' });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
+
+export async function resendVerificationRequest(email, res) {
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+    }
+    if (user.verify) {
+        return res
+            .status(400)
+            .json({ message: 'Verification has already been passed' });
+    }
+    const verificationUserLink = `http://localhost:3000/api/auth/verify/${user.verificationToken}`;
+    await await sendMail(
+        user.email,
+        'Verification email',
+        `Click on link for verification: ${verificationUserLink}`
+    );
 }

@@ -11,6 +11,8 @@ import {
     getCurrent,
     logout,
     changeAvatar,
+    validateUser,
+    revalidateUserEmail,
 } from '../controllers/authControllers.js';
 import { registerSchema } from '../schemas/authSchema.js';
 
@@ -38,5 +40,7 @@ authRouter.patch(
     upload.single('picture'),
     changeAvatar
 );
+authRouter.post('/verify', revalidateUserEmail);
+authRouter.get('/verify/:verificationToken', validateUser);
 
 export default authRouter;

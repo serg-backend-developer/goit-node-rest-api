@@ -3,10 +3,12 @@ import fs from 'fs/promises';
 import path from 'path';
 
 import {
-    registerUser,
     loginUser,
     logoutUser,
+    registerUser,
+    resendVerificationRequest,
     uploadAvatar,
+    validateCurrUser,
 } from '../services/authServices.js';
 
 import { __dirname } from '../constants/consts.js';
@@ -74,5 +76,38 @@ export const changeAvatar = async (req, res) => {
         res.status(200).json({ avatarURL });
     } catch (error) {
         res.status(500).json({ error: 'Failed to upload avatar.' });
+    }
+};
+
+export const validateUser = async (req, res) => {
+    try {
+        await validateCurrUser(req, res);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const revalidateUserEmail = async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email) {
+            return res
+                .status(400)
+                .json({ message: 'Email field is required.' });
+        }
+        const user = await resendVerificationRequest(email);
+        return res
+            .status(200)
+            .json({
+                message: 'Verification email has been successfully sent.',
+            });
+    } catch (error) {
+        console.error(error);
+        return res
+            .status(500)
+            .json({
+                message:
+                    'An unexpected error occurred while processing the request.',
+            });
     }
 };

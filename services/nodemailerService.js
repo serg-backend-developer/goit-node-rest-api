@@ -1,22 +1,22 @@
 import nodemailer from 'nodemailer';
 
-const mailTransporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: 465,
-    secure: true,
-    auth: {
-        user: process.env.EMAIL,
-        pass: process.env.EMAIL_PASSWORD,
-    },
-});
-
-export async function sendMail({ recipient, title, content }) {
+export async function sendEmailTo(to, subject, text) {
     try {
+        const mailTransporter = nodemailer.createTransport({
+            host: process.env.EMAIL_HOST,
+            port: 465,
+            secure: true,
+            auth: {
+                user: process.env.EMAIL,
+                pass: process.env.EMAIL_PASSWORD,
+            },
+        });
+
         const info = await mailTransporter.sendMail({
             from: process.env.EMAIL,
-            to: recipient,
-            subject: title,
-            text: content,
+            to,
+            subject,
+            text,
         });
 
         console.log(`Email sent successfully: ${info.messageId}`);

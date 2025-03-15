@@ -4,7 +4,7 @@ import multer from 'multer';
 import path from 'path';
 
 import { SECRET_KEY } from '../constants/consts.js';
-import { sendMail } from './nodemailerService.js';
+import { sendEmailTo } from './nodemailerService.js';
 import { verificationToken, verificationLink } from '../constants/consts.js';
 import User from '../models/User.js';
 
@@ -32,7 +32,7 @@ export async function registerUser(email, password) {
             password: hashedPassword,
             verificationToken,
         });
-        await sendMail(
+        await sendEmailTo(
             newUser.email,
             'Verification email',
             `Click on link for verification: ${verificationLink}`
@@ -138,7 +138,7 @@ export async function resendVerificationRequest(email, res) {
             .json({ message: 'Verification has already been passed' });
     }
     const verificationUserLink = `http://localhost:3000/api/auth/verify/${user.verificationToken}`;
-    await await sendMail(
+    await await sendEmailTo(
         user.email,
         'Verification email',
         `Click on link for verification: ${verificationUserLink}`
